@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type React from "react" // Added import for React
@@ -14,6 +15,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               Back to Home
             </Button>
           </Link>
+          <div className="flex-grow flex justify-center">
+            <Image src="/logo_small.png" alt="App Logo" width={200} height={100} className="h-12 w-auto" />
+          </div>
+
           <div className="space-x-4">
             <Link href="/whats-in-my-fridge">
               <Button variant="ghost" size="sm" className="text-white hover:text-green-200">

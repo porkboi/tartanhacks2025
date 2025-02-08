@@ -1,10 +1,14 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Raleway } from "next/font/google";
+
+const raleway = Raleway({ subsets: ["latin"], weight: ["400", "700"] });
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-      <h1 className="text-4xl font-bold mb-8 text-green-700">Fridge Recipes</h1>
+    <div className={`flex flex-col items-center justify-center min-h-screen bg-white ${raleway.className}`}>
+      <Image src="/logo.jpg" alt="Fridge Recipes Logo" width={300} height={100.8} className="mb-4" />
       <div className="grid grid-cols-1 gap-4">
         <Link href="/whats-in-my-fridge">
           <Button className="w-64 bg-green-600 hover:bg-green-700">What's in My Fridge</Button>
@@ -14,6 +18,5 @@ export default function HomePage() {
         </Link>
       </div>
     </div>
-  )
+  );
 }
-

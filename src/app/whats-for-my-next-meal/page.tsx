@@ -1,81 +1,80 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import Layout from "../components/layout"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Textarea } from "@/components/ui/textarea"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import type { FoodItem } from "@/lib/mockDb"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Layout from "../components/layout";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import type { FoodItem } from "@/lib/mockDb";
 
 export default function WhatsForMyNextMealPage() {
-  const [foodItems, setFoodItems] = useState<FoodItem[]>([])
-  const [selectedItems, setSelectedItems] = useState<number[]>([])
-  const [recipe, setRecipe] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [recommendedItems, setRecommendedItems] = useState<FoodItem[]>([])
-  const router = useRouter()
+  const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [recipe, setRecipe] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [recommendedItems, setRecommendedItems] = useState<FoodItem[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    fetchFoodItems()
-  }, [])
+    fetchFoodItems();
+  }, []);
 
   const fetchFoodItems = async () => {
     try {
-      const response = await fetch("/api/get-food-items")
+      const response = await fetch("/api/get-food-items");
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json();
         setFoodItems(
-          data.sort((a: FoodItem, b: FoodItem) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime()),
-        )
-        updateRecommendedItems(data)
+          data.sort((a: FoodItem, b: FoodItem) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime())
+        );
+        updateRecommendedItems(data);
       } else {
-        console.error("Failed to fetch food items")
+        console.error("Failed to fetch food items");
       }
     } catch (error) {
-      console.error("Error fetching food items:", error)
+      console.error("Error fetching food items:", error);
     }
-  }
+  };
 
   const updateRecommendedItems = (items: FoodItem[]) => {
-    const twoDaysFromNow = new Date()
-    twoDaysFromNow.setDate(twoDaysFromNow.getDate() + 2)
+    const twoDaysFromNow = new Date();
+    twoDaysFromNow.setDate(twoDaysFromNow.getDate() + 2);
 
-    const expiringSoon = items.filter((item) => new Date(item.expiryDate) <= twoDaysFromNow)
-    const recommended = []
+    const expiringSoon = items.filter((item) => new Date(item.expiryDate) <= twoDaysFromNow);
+    const recommended = [];
 
-    const categories = ["Grain", "Vegetable", "Protein"]
+    const categories = ["Grain", "Vegetable", "Protein"];
     for (const category of categories) {
-      const item = expiringSoon.find((item) => item.category === category)
-      if (item) recommended.push(item)
+      const item = expiringSoon.find((item) => item.category === category);
+      if (item) recommended.push(item);
     }
 
-    // Add other expiring items if we don't have all categories
     for (const item of expiringSoon) {
       if (!recommended.includes(item)) {
-        recommended.push(item)
+        recommended.push(item);
       }
-      if (recommended.length >= 3) break
+      if (recommended.length >= 3) break;
     }
 
-    setRecommendedItems(recommended)
-  }
+    setRecommendedItems(recommended);
+  };
 
   const handleItemSelect = (id: number) => {
-    setSelectedItems((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]))
-  }
+    setSelectedItems((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
+  };
 
   const handleGenerate = async () => {
     if (selectedItems.length === 0) {
-      alert("Please select at least one ingredient")
-      return
+      alert("Please select at least one ingredient");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const selectedIngredients = foodItems.filter((item) => selectedItems.includes(item.id)).map((item) => item.name)
+      const selectedIngredients = foodItems.filter((item) => selectedItems.includes(item.id)).map((item) => item.name);
 
       const response = await fetch("/api/generate-recipe", {
         method: "POST",
@@ -83,15 +82,15 @@ export default function WhatsForMyNextMealPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ ingredients: selectedIngredients }),
-      })
-      const data = await response.json()
-      setRecipe(data.recipe)
+      });
+      const data = await response.json();
+      setRecipe(data.recipe);
     } catch (error) {
-      console.error("Error generating recipe:", error)
+      console.error("Error generating recipe:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleAccept = async () => {
     try {
@@ -101,19 +100,31 @@ export default function WhatsForMyNextMealPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ ids: selectedItems }),
-      })
+      });
       if (response.ok) {
-        setRecipe("")
-        setSelectedItems([])
-        fetchFoodItems()
-        router.refresh()
+        setRecipe("");
+        setSelectedItems([]);
+        fetchFoodItems();
+        router.refresh();
       } else {
-        console.error("Failed to update food items")
+        console.error("Failed to update food items");
       }
     } catch (error) {
-      console.error("Error updating food items:", error)
+      console.error("Error updating food items:", error);
     }
-  }
+  };
+
+  // Function to determine the dot color based on expiry date
+  const getExpiryStatus = (expiryDate: string) => {
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    const twoWeeksFromNow = new Date();
+    twoWeeksFromNow.setDate(today.getDate() + 14);
+
+    if (expiry < today) return "bg-black"; // Expired
+    if (expiry < twoWeeksFromNow) return "bg-red-500"; // Less than 2 weeks to expire
+    return "bg-green-500"; // Safe
+  };
 
   return (
     <Layout>
@@ -141,6 +152,7 @@ export default function WhatsForMyNextMealPage() {
             <TableHead>Category</TableHead>
             <TableHead>Expiry Date</TableHead>
             <TableHead>Quantity</TableHead>
+            <TableHead>Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -153,6 +165,13 @@ export default function WhatsForMyNextMealPage() {
               <TableCell>{item.category}</TableCell>
               <TableCell>{item.expiryDate}</TableCell>
               <TableCell>{item.quantity}</TableCell>
+              <TableCell>
+                <div className="relative w-4 h-4">
+                  <div
+                    className={`w-4 h-4 rounded-full ${getExpiryStatus(item.expiryDate)} animate-pulse`}
+                  ></div>
+                </div>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -169,6 +188,5 @@ export default function WhatsForMyNextMealPage() {
         </div>
       )}
     </Layout>
-  )
+  );
 }
-
