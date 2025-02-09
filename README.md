@@ -9,3 +9,6 @@ Frontend: Node.js, Next.js
 Backend: Axios, PIL, OCR
 Database: SQLlite
 
+<h2> Pictures </h2>
+
+![alt text](https://github.com/porkboi/tartanhacks2025/blob/main/img/Screenshot%202025-02-08%20140303.png)
